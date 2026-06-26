@@ -9,7 +9,53 @@ import sys
 # Add src directory to path
 sys.path.append(os.path.join(os.path.dirname(__file__), 'src'))
 
-from crop_recommendation import CropRecommendationSystem
+# Auto-train model if it doesn't exist
+@st.cache_resource
+def ensure_model_exists():
+    """Ensure model and data exist, train if necessary"""
+    model_dir = os.path.join(os.path.dirname(__file__), 'models')
+    data_dir = os.path.join(os.path.dirname(__file__), 'data')
+    data_path = os.path.join(data_dir, 'crop_recommendation.csv')
+    
+    # Create directories
+    os.makedirs(model_dir, exist_ok=True)
+    os.makedirs(data_dir, exist_ok=True)
+    
+    # Check if model exists
+    model_path = os.path.join(model_dir, 'crop_recommendation_model.pkl')
+    if not os.path.exists(model_path):
+        st.info("Training model for first use... This may take a minute.")
+        from data_preprocessing import DataPreprocessor
+        from model_training import ModelTrainer
+        
+        # Download dataset if not exists
+        if not os.path.exists(data_path):
+            try:
+                import kagglehub
+                st.info("Downloading dataset from Kaggle...")
+                path = kagglehub.dataset_download('atharvaingle/crop-recommendation-dataset')
+                import shutil
+                shutil.copy(f'{path}/Crop_recommendation.csv', data_path)
+            except:
+                st.error("Could not download dataset. Please ensure kagglehub is installed.")
+                return False
+        
+        # Train model
+        preprocessor = DataPreprocessor(data_path)
+        X_train_scaled, X_test_scaled, y_train, y_test, scaler, label_encoder = preprocessor.preprocess_pipeline()
+        preprocessor.save_preprocessors(model_dir)
+        
+        trainer = ModelTrainer(model_dir)
+        feature_names = ['N', 'P', 'K', 'temperature', 'humidity', 'ph', 'rainfall']
+        trainer.training_pipeline(X_train_scaled, X_test_scaled, y_train, y_test, label_encoder, feature_names)
+        
+        st.success("Model trained successfully!")
+    
+    return True
+
+# Ensure model exists before loading
+if ensure_model_exists():
+    from crop_recommendation import CropRecommendationSystem
 
 # Page configuration
 st.set_page_config(
