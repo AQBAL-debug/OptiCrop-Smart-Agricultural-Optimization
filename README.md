@@ -151,6 +151,73 @@ streamlit run app.py --server.port 8502
 6. Temperature: 7.2%
 7. Soil pH: 5.1%
 
+## Deployment
+
+### Option 1: Streamlit Community Cloud (Recommended - Free)
+
+**Easiest deployment option for Streamlit apps**
+
+1. Go to [share.streamlit.io](https://share.streamlit.io)
+2. Sign up/login with your GitHub account
+3. Click "New app"
+4. Select your repository: `AQBAL-debug/OptiCrop-Smart-Agricultural-Optimization`
+5. Select branch: `main`
+6. Main file path: `app.py`
+7. Click "Deploy"
+
+**Important:** Since the dataset and model files are in `.gitignore`, you'll need to:
+- Either add them to the repository (not recommended for large files)
+- Or use Streamlit's secrets to store them
+- Or modify the app to download them on startup
+
+### Option 2: Heroku (Free Tier Available)
+
+1. Install Heroku CLI: [https://devcenter.heroku.com/articles/heroku-cli](https://devcenter.heroku.com/articles/heroku-cli)
+2. Login to Heroku:
+```bash
+heroku login
+```
+3. Create a new Heroku app:
+```bash
+heroku create opticropt-app
+```
+4. Push to Heroku:
+```bash
+git push heroku main
+```
+
+### Option 3: Render (Free Tier Available)
+
+1. Go to [render.com](https://render.com)
+2. Sign up/login
+3. Click "New +" → "Web Service"
+4. Connect your GitHub repository
+5. Configure:
+   - **Build Command:** `pip install -r requirements.txt && python train.py`
+   - **Start Command:** `streamlit run app.py --server.port $PORT`
+6. Click "Deploy Web Service"
+
+### Option 4: Local Deployment
+
+For local deployment, follow the Installation & Setup section above.
+
+## GitHub Repository
+
+The project is hosted on GitHub:
+**https://github.com/AQBAL-debug/OptiCrop-Smart-Agricultural-Optimization**
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## License
+
+This project is open source and available for educational and research purposes.
+
+## Contact
+
+For questions or suggestions, please open an issue on GitHub.
+
 ## Project Structure
 
 ```
